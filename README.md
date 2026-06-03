@@ -134,9 +134,98 @@ Linux builds do not require signing.
 
 ---
 
+## Building for iOS
+
+Requires macOS with Xcode installed.
+
+```bash
+# Add iOS Rust targets (one-time)
+rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
+
+# Initialize the Xcode project (one-time, commit the generated gen/apple/ directory)
+npm run tauri ios init
+
+# Run on simulator
+npm run tauri ios dev
+
+# Build IPA for distribution
+npm run tauri ios build -- --export-method app-store-connect
+```
+
+Output: `src-tauri/gen/apple/build/arm64/PortableWeb.ipa`
+
+### iOS Signing
+
+Requires an [Apple Developer Program](https://developer.apple.com/programs/) membership ($99/year).
+
+1. Create a Distribution certificate in Xcode → Settings → Accounts.
+2. Create an App ID and Provisioning Profile in the Apple Developer portal.
+3. For CI, store the following as GitHub Actions secrets:
+
+| Secret | Description |
+|---|---|
+| `IOS_CERTIFICATE` | Base64-encoded `.p12` distribution certificate |
+| `IOS_CERTIFICATE_PASSWORD` | Password for the `.p12` file |
+| `IOS_PROVISIONING_PROFILE` | Base64-encoded `.mobileprovision` file |
+| `KEYCHAIN_PASSWORD` | Any password — used to create a temp keychain in CI |
+| `APPLE_TEAM_ID` | Your 10-character Apple Team ID |
+
+---
+
+## Building for Android
+
+Requires Android Studio, JDK 17, and Android NDK.
+
+```bash
+# Install Android NDK via Android Studio SDK Manager or sdkmanager:
+sdkmanager "ndk;27.0.12077973"
+export NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973
+
+# Add Android Rust targets (one-time)
+rustup target add \
+  aarch64-linux-android \
+  armv7-linux-androideabi \
+  i686-linux-android \
+  x86_64-linux-android
+
+# Initialize the Android project (one-time, commit the generated gen/android/ directory)
+npm run tauri android init
+
+# Run on emulator or connected device
+npm run tauri android dev
+
+# Build APK + AAB for distribution
+npm run tauri android build
+```
+
+Output: `src-tauri/gen/android/app/build/outputs/`
+
+### Android Signing
+
+1. Generate a keystore (one-time):
+
+```bash
+keytool -genkey -v \
+  -keystore portableweb.jks \
+  -alias portableweb \
+  -keyalg RSA -keysize 2048 \
+  -validity 10000
+```
+
+2. For CI, store the following as GitHub Actions secrets:
+
+| Secret | Description |
+|---|---|
+| `ANDROID_KEYSTORE` | Base64-encoded `.jks` keystore file |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
+| `ANDROID_KEY_ALIAS` | Key alias (e.g. `portableweb`) |
+| `ANDROID_KEY_PASSWORD` | Key password |
+
+---
+
 ## Releasing
 
-Push a version tag to trigger the GitHub Actions release workflow, which builds for all three platforms in parallel and creates a draft GitHub Release:
+Push a version tag to trigger the GitHub Actions release workflow, which builds for all five platforms in parallel (macOS, Windows, Linux, iOS, Android) and creates a draft GitHub Release:
 
 ```bash
 git tag v0.1.0
@@ -144,3 +233,5 @@ git push origin v0.1.0
 ```
 
 Review the draft release on GitHub, then publish when ready.
+
+> **Note:** Before the first mobile release, run `npm run tauri ios init` and `npm run tauri android init` locally and commit the generated `src-tauri/gen/` directory. The CI workflow depends on these files being present.

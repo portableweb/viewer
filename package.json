@@ -1,0 +1,23 @@
+{
+  "name": "portableweb-viewer",
+  "private": true,
+  "description": "PortableWeb viewer monorepo — shared core plus thin per-platform adapters",
+  "workspaces": [
+    "packages/core",
+    "packages/adapter-api",
+    "packages/shims",
+    "packages/store",
+    "packages/electron",
+    "packages/mobile/ios",
+    "packages/mobile/android",
+    "packages/web"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0"
+  }
+}

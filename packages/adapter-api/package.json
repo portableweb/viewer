@@ -1,0 +1,8 @@
+{
+  "name": "@portableweb/adapter-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Contract types every platform adapter implements — not yet defined",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts"
+}

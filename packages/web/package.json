@@ -1,0 +1,6 @@
+{
+  "name": "@portableweb/web-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser-based viewer adapter — parked"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@portableweb/mobile-ios",
+  "version": "0.1.0",
+  "private": true,
+  "description": "iOS viewer (Capacitor) — scaffolded, unverified (no Xcode/CocoaPods in this environment)",
+  "dependencies": {
+    "@capacitor/core": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/ios": "^8.0.0"
+  }
+}

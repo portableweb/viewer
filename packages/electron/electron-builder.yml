@@ -1,0 +1,63 @@
+appId: org.portableweb.viewer
+productName: PortableWeb
+copyright: Copyright © 2026 Omprakash Selvaraj
+# Pinned explicitly — electron-builder's auto-detection doesn't reliably
+# find a hoisted `electron` devDependency under npm workspaces.
+electronVersion: 33.4.11
+# Mitigates (doesn't fully solve — see README.md "Packaging" section) a
+# real issue hit while writing this config: electron-builder's dependency
+# install/prune step doesn't understand npm workspace hoisting and pruned
+# devDependencies from the *workspace root* node_modules, not just this
+# package's. Verify in an isolated clone before relying on `npm run dist`.
+npmRebuild: false
+buildDependenciesFromSource: false
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist/**/*
+  - package.json
+
+# CONTAINER.md §3 — the format's own media type, so double-clicking a
+# .pweb file on any platform launches this viewer.
+fileAssociations:
+  - ext: pweb
+    name: PortableWeb Bundle
+    description: A self-contained, sandboxed PortableWeb document
+    role: Viewer
+    mimeType: application/vnd.portableweb+zip
+    icon: build/icons/icon
+
+mac:
+  category: public.app-category.productivity
+  icon: build/icons/icon.icns
+  target:
+    - dmg
+  # Signing/notarization deferred — needs an Apple Developer account
+  # ($99/yr), per CLAUDE.md §8. Unsigned builds work locally; Gatekeeper
+  # warns on first launch until this is set up.
+
+win:
+  icon: build/icons/icon.png
+  target:
+    - nsis
+  # icon.png here is a placeholder — electron-builder's NSIS target wants
+  # a proper multi-resolution .ico. Generate one (e.g. via
+  # `npx electron-icon-builder --input=build/icons/icon.png --output=build/icons`)
+  # before a real Windows build; cross-building from macOS without it will
+  # likely fail or produce a low-quality icon.
+
+linux:
+  icon: build/icons/icon.png
+  category: Office
+  target:
+    - AppImage
+    - deb
+
+# Cross-compiling Windows/Linux installers from this macOS machine is
+# possible with electron-builder but not attempted here — see
+# packages/electron/README.md. `npm run dist` on this machine produces a
+# macOS .dmg; Windows/Linux artifacts are a CI job, same as the old Tauri
+# release workflow this replaced.
